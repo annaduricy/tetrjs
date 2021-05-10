@@ -1,3 +1,7 @@
 * Variables should all start with the same letter
 
 * Numbers could be written like roman numerals?
+
+* Drag and drop to program? Like drag tetris pieces onto a tetris board
+
+* Make a TAS that writes a tetris program
