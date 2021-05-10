@@ -1,0 +1,3 @@
+* Variables should all start with the same letter
+
+* Numbers could be written like roman numerals?
