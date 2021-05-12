@@ -4,22 +4,32 @@ from sly import Lexer
 from sly import Parser
 
 class BasicLexer(Lexer):
-    tokens = { NAME, NUMBER, STRING }
+    tokens = { VAR, NUMBER, STRING }
     ignore = '\t '
-    literals = {'T', 't', 'J', 'j', 'Z', 'z', 'O', 'o', 'S', 's', 'L', 'l' 'I', 'i', '.'}
+    literals = {'T', 'J', 'Z', 'O', 'S', 'L', 'I', '.', '='}
 
-    # Define tokens as regular expressions
-    # (stored as raw strings)
-    NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
+    # Every variable must start with a T
+    VAR = r'[T][T|J|Z|O|S|L|I]+'
     STRING = r'\".*?\"'
 
-    # Number token
-    @_(r'\d+')
+    # Every number must start with an I
+    # An I with nothing following it could be a 0
+    @_(r'[I][T|J|Z|O|S|L|I]*')
     def NUMBER(self, t):
-        # convert it into a python integer
-        t.value = int(t.value)
-        return t
+        num_dict = {'T': 1, 'J': 5, 'Z': 10, 'O': 50, 'S': 100, 'L': 500, 'I': 1000}
 
+        # The [1:] removes the first I
+        num_list = t.value
+        #print(type(num_list))
+        #value = num_list
+
+        # for x in range(0, len(num_list)-1):
+        #     if num_dict[num_list[x]] >= num_dict[num_list[x+1]]:
+        #         value += num_dict[num_list[x]]
+        #     else:
+        #         value -= num_dict[num_list[x]]
+
+        return 3
     # Comment token
     @_(r'//.*')
     def COMMENT(self, t):
@@ -52,13 +62,13 @@ class BasicParser(Parser):
     def statement(self, p):
         return p.var_assign
 
-    @_('NAME "=" expr')
+    @_('VAR "=" expr')
     def var_assign(self, p):
-        return ('var_assign', p.NAME, p.expr)
+        return ('var_assign', p.VAR, p.expr)
 
-    @_('NAME "=" STRING')
+    @_('VAR "=" STRING')
     def var_assign(self, p):
-        return ('var_assign', p.NAME, p.STRING)
+        return ('var_assign', p.VAR, p.STRING)
 
     @_('expr')
     def statement(self, p):
@@ -84,9 +94,9 @@ class BasicParser(Parser):
     def expr(self, p):
         return p.expr
 
-    @_('NAME')
+    @_('VAR')
     def expr(self, p):
-        return ('var', p.NAME)
+        return ('var', p.VAR)
 
     @_('NUMBER')
     def expr(self, p):
